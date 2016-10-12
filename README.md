@@ -6,12 +6,17 @@ The company was in need of a website change, so Deverath Iyer and I designed a n
 
 1. Real-Time Tracking
 
-In order to inform the customers of where the bus is during its route and how long it will take to get to its stop, we used a Google Maps JavaScript API and a GPS Insights marker that was on the bus to display where the bus is relative to its stops to the users. In addition, since we used created a Django Project, our administrator end allows the bus driver to add new destinations to bus schedule. 
+In order to inform the customers of where the bus is during its route and how long it will take to get to its stop, we used a Google Maps JavaScript API and a GPS Insights marker that was on the bus to display where the bus is relative to its stops to the users. In addition, since we created a Django Project, our administrator end allows the bus driver to add new destinations to bus schedule. 
 
-![Alt text](/relative/path/to/gmap.png?raw=true "Map with Geomarker")
+![alt text](https://github.com/SachinKonan/FreshExpress/blob/master/FreshExpressMASTER/gmap.png "Map with Geomarker")
 
 
 2. Recipe Search
 
-With the bevy of ingredients on the bus, our website allows the bus driver to add ingredients to the website through the administrator end. We used a recipypuppy API and a search method to find exact recipes based on the number and types of ingredients. 
+With the bevy of ingredients on the bus, our website allows the bus driver to add ingredients to the website through  administrator end. We used a recipypuppy API and a search method to find exact recipes based on the number and types of ingredients.
+
+The website was deployed to heroku.
+
+![alt text](https://github.com/SachinKonan/FreshExpress/blob/master/FreshExpressMASTER/Website.png "Website")
+
 
