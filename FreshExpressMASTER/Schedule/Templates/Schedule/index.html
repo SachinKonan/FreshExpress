@@ -1,0 +1,227 @@
+html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<div id = 'main'>
+<div id="map"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCoX6Q_bjn6KlSlKWBfvm5Q7EZ0e7fhT_o&callback=initMap" async defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<div id= "results"></div>
+</div>
+</head>
+
+<ul class="w3-navbar w3-green w3-card-2 w3-top w3-left-align w3-large">
+  <li class="w3-hide-medium w3-hide-large w3-opennav w3-right">
+    <a class="w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+  </li>
+  <li><a href="http://127.0.0.1:9000+" class="w3-padding-large">Home</a></li>
+  <li class="w3-hide-small"><a href="127.0.0.1:9000/schedule" class="w3-padding-large w3-hover-white
+">Real-Time Tracking</a></li>
+  <li class="w3-hide-small"><a href="http://127.0.0.1:9000/ingredients" class="w3-padding-large w3-hover-white">Inventory/Recipes</a></li>
+</ul>
+
+<!-- Navbar on small screens -->
+<div id="navDemo" class="w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:51px">
+  <ul class="w3-navbar w3-left-align w3-large w3-black">
+    <li><a class="w3-padding-large" href="#">Link 1</a></li>
+    <li><a class="w3-padding-large" href="#">Link 2</a></li>
+    <li><a class="w3-padding-large" href="#">Link 3</a></li>
+    <li><a class="w3-padding-large" href="#">Link 4</a></li>
+  </ul>
+</div>
+
+<!-- Header -->
+<div class="w3-row-padding w3-padding-64 w3-container">
+  <div class="w3-content">
+    <div class="w3-twothird">
+      <h1>Destination</h1>
+       <table style="width:100%">
+         <tr>
+          <th>Stop Number</th>
+          <th>Address</th>
+          <th>Time</th>
+         </tr>
+        {% for Stop in stops %}
+         <tr>
+           <td>{{Stop.stop_number}}</td>
+           <td>{{Stop.time}}</td>
+           <td>{{Stop.location}}</td>
+         </tr>
+        {%endfor%}
+      </table>
+</h5>
+
+
+
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#map {
+  height: 100%;
+  width: 100%;
+  position:absolute;
+}
+
+#main{
+  height:100%;
+  position:relative;
+
+}
+#results{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: black;
+  background: rgba(255,255,255,0.7);
+
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}
+th {
+    text-align: left;
+}
+</style>
+<script>
+var map;
+
+var marker;
+
+var lineCoordinatesArray = [];
+var destinations = [[33.25,-111.847944], [33.28,-111.88],[33.279791,-111.860386],[33.30,-111.84]];
+
+var destinations1 = [];
+
+var timetoDestination = []
+
+function initMap()
+{
+  map = new google.maps.Map(document.getElementById('map'),
+  {
+    center: {lat: 33.27, lng: -111},
+    zoom: 8
+  });
+
+   marker = new google.maps.Marker({
+    position: {lat: 33.27, lng: -111},
+    map: map,
+    title: 'Start'
+  });
+
+  for(var i = 0; i < destinations.length;i++) destinations1[i]= new google.maps.LatLng(destinations[i][0], destinations[i][1]);
+
+    var geocoder = new google.maps.Geocoder;
+
+
+
+ drawFoodTruck();
+
+
+
+}
+
+ function drawFoodTruck()
+ {
+
+ 	var location = getLocation();
+
+  updateTimeData(location[0], location[1]);
+
+  map.setCenter({lat: location[0], lng : location[1]});
+
+  marker.setPosition({lat: location[0], lng : location[1]});
+
+  marker.setTitle(location[2]);
+
+  pushCoordToArray(location[0], location[1]);
+
+
+  var lineCoordinatesPath = new google.maps.Polyline({
+  path: lineCoordinatesArray,
+  geodesic: true,
+  strokeColor: '#2E10FF',
+  strokeOpacity: 1.0,
+  strokeWeight: 2
+  });
+
+  lineCoordinatesPath.setMap(map);
+
+  setTimeout(drawFoodTruck, 30000);
+
+ }
+
+ function getLocation()
+ {
+  var location;
+ 	var data= $.ajax({
+      url: 'http://gpsinsight.herokuapp.com/freshexpress',
+      async: false,
+      dataType: "json"
+   }).responseText;
+
+   var data1 = $.parseJSON(data);
+   return [data1.data[0].latitude,data1.data[0].longitude,data1.data[0].address];
+ }
+
+ function pushCoordToArray(latIn, lngIn) {
+      lineCoordinatesArray.push(new google.maps.LatLng(latIn, lngIn));
+  }
+
+  function updateTimeData(lat, long)
+  {
+  	var service = new google.maps.DistanceMatrixService;
+        service.getDistanceMatrix({
+          origins: [new google.maps.LatLng(lat,long)],
+          destinations: destinations1,
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC,
+          avoidHighways: false,
+          avoidTolls: false
+        }, function(response, status) {
+          if (status !== google.maps.DistanceMatrixStatus.OK) {
+            alert('Error was: ' + status);
+          } else {
+
+            var originList = response.originAddresses;
+            var destinationList = response.destinationAddresses;
+
+            for (var i = 0; i < originList.length; i++)
+            {
+              var results = response.rows[i].elements;
+              for (var j = 0; j < results.length; j++)
+              {
+              var element = results[j];
+              timetoDestination[j]= element.duration.text;
+              }
+            }
+
+            $('#results').empty();
+
+            console.log(timetoDestination);
+
+            $(timetoDestination).each(function(index)
+            {
+            $('#results').append('<div> ' + destinations[index] + ' (long,lat) ' + ':' + this+  '</div>');
+            });
+          }
+        });
+      }
+
+
+ // console.log(data.responseJSON);
+
+  //var data1 = $.parseJSON(data);
+  //console.log(data1.data)
+</script>
+<html>
